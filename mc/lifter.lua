@@ -49,11 +49,24 @@ end
 -- try require("Folder.Filename") to include code from another file in this, so you can store code in libraries
 -- the "LifeBoatAPI" is included by default in /_build/libs/ - you can use require("LifeBoatAPI") to get this, and use all the LifeBoatAPI.<functions>!
 
+altMax = 0
 ticks = 0
 function onTick()
     ticks = ticks + 1
-end
 
-function onDraw()
-    screen.drawCircle(16,16,5)
+    altBase = input.getNumber(1)
+    altCurrent = input.getNumber(2)
+    altMax = math.max(altMax, altCurrent - altBase)
+
+    isTurnedOn = input.getBool(1)
+
+    moveDirection = 0
+    speed = 1/120 -- up for 4 seconds, down for 4 seconds
+    if isTurnedOn then
+        moveDirection = math.sin(speed* ticks) 
+    end
+
+    
+    output.setNumber(1, -moveDirection) -- invert due to how we built it
+    output.setNumber(2, altMax)
 end
