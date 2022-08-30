@@ -171,6 +171,7 @@ end)
                     :andThen(function (cr, deltaTicks, lastResult)
                         local dial, success = server.getVehicleDial(vehicleID, "LBJACKLIFTER")
                         if success then
+                            vehicle:setCollisionLayer("lifter")
                             mainsave.lifterID = vehicle.id
                             self:terminate()
                         end
@@ -222,7 +223,7 @@ end)
                                 local popup = LifeBoatAPI.UIPopup:new(nil, "It's...Working!\n\nCome over and let's talk!", 0, 1, 0, 100, jack, true)
                                 LifeBoatAPI.CoroutineUtils.disposeAfterDelay(popup, 120)
                                     :andThen(function (cr, deltaTicks, lastResult)
-                                        self.parent:next("WaitForSpawn")
+                                        self.parent:next()
                                     end)
                                 self:attach(popup)
                                 
@@ -263,11 +264,11 @@ end)
                                                    {phrase="nope", next="basic"}}, showChoices=true },
             
                 { id="accept",      text = "Great!\n\nJust paint it up, then bring it back to me."},
-                {                   text = "I'll be back over by my truck", terminate=true},
+                {                   text = "I'll be back over by my truck", terminate=true, result={gotoTruck=true}},
 
                 { id="basic",       text = "No worries."},
                 { id="repeat",      text = "If you can bring it back over to my truck\n\nThen I'll pay you there."},
-                {                   text = "Thanks again!", terminate=true},
+                {                   text = "Thanks again!", terminate=true, result={gotoTruck=true}},
             }, 120)
     
             -- simple dialog handling
@@ -284,6 +285,15 @@ end)
                         mainsave.wasPaintJobOffered = true
                         server.notify(-1, "Additional Task", "Scrape off the rust and re-paint Jack's lifter for an extra $2500", LifeBoatAPI.Constants.NotifiationTypes.new_mission)
                     end
+
+                    if results.gotoTruck then
+                        local teleport = LifeBoatAPI.CoroutineUtils.delay(120):andThen(function (cr, deltaTicks, lastResult)
+                            -- move jack back to their original position
+                            local jackOriginalPos = LB.objects:getZone(mainsave.jackMoveTo1)
+                            server.setObjectPos(jack.id, jackOriginalPos.transform)
+                        end)
+                        self:attach(teleport)
+                    end
                 end)
             self:attach(dialogHandler)
 
@@ -292,11 +302,11 @@ end)
             local listener = LB.events.onVehicleSpawn:register(function (l, context, vehicleID, peerID, x, y, z, cost)
                 if peerID >= 0 then
                     local vehicle = LifeBoatAPI.Vehicle:fromUntrackedSpawn(vehicleID, peerID, cost)
-                    
                     vehicle:awaitLoaded()
                     :andThen(function (cr, deltaTicks, lastResult)
                         local dial, success = server.getVehicleDial(vehicleID, "LBJACKLIFTER")
                         if success then
+                            vehicle:setCollisionLayer("lifter")
                             mainsave.lifterID = vehicle.id
                             mainsave.wasPaintJobComplete = savedata.paintJob -- can't get the paintjob bonus if you didn't even listen to him
                             l.isDisposed = true
@@ -317,8 +327,8 @@ end)
         end)
 
 
-        --- 3.4 Optional quest to repaint the lifter, or return it
-        fixQuest:addNamedStage("RepaintAndReturn", function (self, savedata, params)
+        --- 3.4 Returned for Reward
+        fixQuest:addNamedStage("Reward", function (self, savedata, params)
             server.announce("part 3.4", "success")
             local mainsave = self.parent.parent.savedata
 
@@ -326,55 +336,66 @@ end)
             local jack = LB.objects:getNPC(mainsave.jackID)
             local zone = jack.childZones[1]
 
-            local jackDialogModel = LifeBoatAPI.Dialog:new({
-                { id="start",       text = "Thanks for fixing it!\n\nYou've done a great job.", result={hasSpokenOnce=true}},
-                {                   text = "I know I'm asking a lot.\n\nBut could you give it a lick of paint too?",
-                                    choices={ {phrase="ok", next="accept", result={paintJob=true}},
-                                                {phrase="reward", next="reward"},
-                                                {phrase="no", next="basic"}}, showChoices=true},
-                            
-                { id="reward",      text = "Well, I owe you $5000 for the main job"},
-                {                   text = "I can throw in an extra $2500.\n\nIf you re-paint it for me",
-                                    choices= { {phrase="ok",   next="accept", result={paintJob=true}},
-                                                {phrase="nope", next="basic"}}, showChoices=true },
-            
-                { id="accept",      text = "Great!\n\nJust paint it up, then bring it back to me."},
-                {                   text = "I'll be back over by my truck", terminate=true},
+            -- move jack back to their original position
+            local jackOriginalPos = LB.objects:getZone(mainsave.jackMoveTo1)
+            server.setObjectPos(jack.id, jackOriginalPos.transform)
 
-                { id="basic",       text = "No worries."},
-                { id="repeat",      text = "If you can bring it back over to my truck\n\nThen I'll pay you there."},
-                {                   text = "Thanks again!", terminate=true},
+            local popup = LifeBoatAPI.UIPopup:new(nil, "Over here!", 0, 1, 0, 100, jack, true)
+            LifeBoatAPI.CoroutineUtils.disposeAfterDelay(popup, 120)
+            self:attach(popup)
+
+
+            local jackDialogModel = LifeBoatAPI.Dialog:new({
+                { id="paintJob",        text = "Amazing, you've really outdone yourself.", next="paintJob2", conditionals={wasaPaintJobOffered=true, wasPaintJobComplete=true}},
+                { id="paintJob_off",    text = "I thought you said you'd paint it?\n\nNevermind, this is still good.", next="paintJob_off2", conditionals={wasaPaintJobOffered=true}},
+
+                { id="noPaintJob",  text = "Thanks for fixing it!\n\nYou've done a great job."},
+                {                   text = "Here's your reward, $5000 as promised."},
+                {                   text = "I'm going to finish up these potatoes, and then I guess I'll be going.", terminate=true},
+
+                { id="paintJob2",   text = "I've got $5000 for fixing it.\n\nAnd another $2500 for the paint job!"},
+                {                   text = "I best finish up the potatoes now.\n\nI'll be off shortly."},
+                {                   text = "If you ever want.\n\nYou'd always be welcome on the farm with me."},
+                {                   text = "Anyway, cheerio!", terminate=true},
+
+                { id="paintJob_off2",   text = "I've got $5000 for fixing it."},
+                {                   text = "But I can't pay you for not painting it.\n\n"},
+                {                   text = "I'll be honest.\n\nI'd rather you'd just declined if you couldn't do it."},
+                {                   text = "Well, I'm off.\n\n Thanks again!", terminate=true}
+
             }, 120)
     
             -- simple dialog handling
             local dialogHandler = LifeBoatAPI.DialogUtils.newSimpleZoneDialog(zone, jackDialogModel, jack, 1.0, "",
-                function (dialog)
-                    -- when starting the dialog, decide the starting point by previous options picked
-                    -- if you rudley cut out, you miss out on the side quest - that's your own fault.
-                    dialog:gotoNextLine(savedata.hasSpokenOnce and "repeat" or "start")
-                end,
+                nil,
                 function (l, context, dialog, results, player)
                     -- on dialog ended, save the results
                     LifeBoatAPI.lb_copy(results, savedata)
-                    if results.paintJob then
-                        server.notify(-1, "Additional Task", "Scrape off the rust and re-paint Jack's lifter for an extra $2500", LifeBoatAPI.Constants.NotifiationTypes.new_mission)
-                        self:terminate()
+
+                    server.notify(-1, "Reward", "You've been paid $5000 for completing 'Jacks Fork'd Lifter'.", LifeBoatAPI.Constants.NotifiationTypes.complete_mission)
+                    if mainsave.wasPaintJobComplete then
+                        server.notify(-1, "Bonus Reward", "Jack has paid you an additional $2500 for painting the lifter.", LifeBoatAPI.Constants.NotifiationTypes.complete_mission)
                     end
-                end)
+
+                    if not mainsave.rewardPaid then
+                        mainsave.rewardPaid = true
+                        local reward = 5000 + (mainsave.wasPaintJobComplete and 2500 or 0)
+                        server.setCurrency(server.getCurrency() + reward, server.getResearchPoints())
+                    end
+
+                    self:terminate()
+                end, {wasPaintJobOffered=mainsave.wasPaintJobOffered, wasPaintJobComplete=mainsave.wasPaintJobComplete})
     
             self:attach(dialogHandler)
-
-
-            -- loop back for testing purposes
-            self.parent:next("WaitForSpawn")
         end)
 
     -- 4. The lifter is fixed, and Jack wants to use it, or something like that
     Mission_JacksQuest:addStage(function (self, savedata, params)
-        server.announce("complete,ish", "use this to go *back* to a stage if we mess up")
-        self.parent:next("FixLifter")
-    end)
+        server.announce("all complete", "awaiting before despawning everything")
 
-    Mission_JacksQuest:addStage(function (self, savedata, params)
-        server.announce("ish3332", "use this to go *back* to a stage if we mess up")
+        local timeout = LifeBoatAPI.CoroutineUtils.delay(300)
+            :andThen(function (cr, deltaTicks, lastResult)
+                self:terminate()
+            end)
+        self:attach(timeout)
     end)
