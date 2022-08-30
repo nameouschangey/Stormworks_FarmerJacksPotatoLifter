@@ -48,7 +48,6 @@ end)
 
     -- 1. Jack offers you the quest
     Mission_JacksQuest:addStage(function (self, savedata, params)
-        server.announce("part 1", "dialog")
         local mainsave = self.parent.savedata
 
         local jackDialogModel = LifeBoatAPI.Dialog:new({
@@ -105,7 +104,6 @@ end)
     --2. Move the lifter to the workbench area
     Mission_JacksQuest:addStage(function (self, savedata, params)
         local mainsave = self.parent.savedata
-        server.announce("part 2", "move the lifter")
 
         local lifter = LB.objects:getVehicle(mainsave.lifterID)
         local workbenchZone = LB.objects:getZone(mainsave.workbenchZoneID)
@@ -154,7 +152,6 @@ end)
 
     -- 3. Fix the Lifter
     local fixQuest = Mission_JacksQuest:addNamedStage("FixLifter", function (self, savedata, params)
-        server.announce("part 3", "nothing")
     end)
 
         -- loop these quest stages, until we have a working/valid vehicle
@@ -162,7 +159,6 @@ end)
         fixQuest:addNamedStage("WaitForSpawn", function (self, savedata, params)
             local mainsave = self.parent.parent.savedata
 
-            server.announce("part 3.1", "waiting")
             local listener = LB.events.onVehicleSpawn:register(function (l, context, vehicleID, peerID, x, y, z, cost)
                 if peerID >= 0 then
                     local vehicle = LifeBoatAPI.Vehicle:fromUntrackedSpawn(vehicleID, peerID, cost)
@@ -186,7 +182,6 @@ end)
         fixQuest:addNamedStage("TestLifter", function (self, savedata, params)
             local mainsave = self.parent.parent.savedata
 
-            server.announce("part 3.2", "testing")
             local vehicle = LB.objects:getVehicle(mainsave.lifterID)
             -- be wary of the vehicle having been despawned, or despawning while "testing" it (e.g. re-entering the workbench)
             if not vehicle then
@@ -208,7 +203,6 @@ end)
                 -- listen for a result
                 local onButton = vehicle.onButtonPress:register(function (l, context, vehicle, player, buttonName)
                     if buttonName == "MISSION_TURNON" and server.getVehicleButton(vehicle.id, buttonName).on then
-                        server.announce("ok", "button pressed")
 
                         local popup = LifeBoatAPI.UIPopup:new(nil, "Ohh, it's moving...\n\nIt's...\n\nIt's...", 0, 1, 0, 100, jack, true)
                         LifeBoatAPI.CoroutineUtils.disposeAfterDelay(popup, 180)
@@ -244,7 +238,6 @@ end)
 
         --- 3.3 The lifter is fixed, we can return to the main flow
         local testSuccess = fixQuest:addNamedStage("TestSuccess", function (self, savedata, params)
-            server.announce("part 3.3", "success")
             local mainsave = self.parent.parent.savedata
 
             -- retrieve the actual Jack instance object
@@ -329,7 +322,6 @@ end)
 
         --- 3.4 Returned for Reward
         fixQuest:addNamedStage("Reward", function (self, savedata, params)
-            server.announce("part 3.4", "success")
             local mainsave = self.parent.parent.savedata
 
             -- retrieve the actual Jack instance object
@@ -391,8 +383,6 @@ end)
 
     -- 4. The lifter is fixed, and Jack wants to use it, or something like that
     Mission_JacksQuest:addStage(function (self, savedata, params)
-        server.announce("all complete", "awaiting before despawning everything")
-
         local timeout = LifeBoatAPI.CoroutineUtils.delay(300)
             :andThen(function (cr, deltaTicks, lastResult)
                 self:terminate()
