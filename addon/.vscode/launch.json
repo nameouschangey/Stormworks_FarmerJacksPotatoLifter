@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Lua",
+            "type": "lua",
+            "request": "launch",
+            "program": "${file}",
+            "path": "${workspaceFolder}/?.lua;${workspaceFolder}/?/init.lua;${workspaceFolder}/_build/libs/?.lua;${workspaceFolder}/_build/libs/?/init.lua"
+        }
+    ]
+}

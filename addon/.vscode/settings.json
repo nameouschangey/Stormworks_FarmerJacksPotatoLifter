@@ -1,0 +1,79 @@
+{
+    "lifeboatapi.stormworks.isMicrocontrollerProject": false,
+    "lifeboatapi.stormworks.isAddonProject": true,
+    "lifeboatapi.stormworks.minimizer.removeComments": true,
+    "lifeboatapi.stormworks.minimizer.reduceAllWhitespace": false,
+    "lifeboatapi.stormworks.minimizer.reduceNewlines": true,
+    "lifeboatapi.stormworks.minimizer.removeRedundancies": true,
+    "lifeboatapi.stormworks.minimizer.shortenVariables": false,
+    "lifeboatapi.stormworks.minimizer.shortenGlobals": false,
+    "lifeboatapi.stormworks.minimizer.shortenNumbers": false,
+    "lifeboatapi.stormworks.minimizer.shortenStringDuplicates": false,
+    "lifeboatapi.stormworks.minimizer.forceNCBoilerplate": false,
+    "lifeboatapi.stormworks.minimizer.forceBoilerplate": false,
+    "Lua.diagnostics.disable": [
+        "lowercase-global",
+        "undefined-doc-name"
+    ],
+    "Lua.diagnostics.globals": [
+        "__simulator",
+        "print",
+        "simulator"
+    ],
+    "Lua.runtime.version": "Lua 5.3",
+    "Lua.runtime.builtin": {
+        "coroutine": "enable",
+        "bit32": "enable",
+        "bit": "enable",
+        "utf8": "enable",
+        "package": "enable",
+        "os": "enable",
+        "jit": "enable",
+        "io": "enable",
+        "ffi": "enable",
+        "debug": "enable",
+        "math": "enable",
+        "string": "enable",
+        "table": "enable",
+        "builtin": "enable",
+        "basic": "enable"
+    },
+    "Lua.workspace.ignoreDir": [
+        ".vscode",
+        "/_build/",
+        "!/_build/libs/",
+        "!/_build/_buildactions.lua"
+    ],
+    "Lua.runtime.path": [
+        "?.lua",
+        "?/init.lua"
+    ],
+    "Lua.runtime.pathStrict": true,
+    "Lua.workspace.library": [
+        "c:/Workspaces/stormworks/projects/mission_test/addon/",
+        "c:/Users/Gordon/.vscode/extensions/nameouschangey.lifeboatapi-0.0.31/assets/lua/Common/",
+        "c:/Users/Gordon/.vscode/extensions/nameouschangey.lifeboatapi-0.0.31/assets/lua/Addon/",
+        "c:/Workspaces/stormworks/projects/mission_test/addon/_build/libs/"
+    ],
+    "lifeboatapi.stormworks.libs.gitLibraries": [
+        {
+            "name": "LifeBoatAPI",
+            "gitUrl": "https://github.com/nameouschangey/Stormworks_LifeBoatAPI_Addon.git"
+        }
+    ],
+    "lifeboatapi.stormworks.libs.sharedGistFiles": [
+        {
+            "gistUrl": "https://gist.github.com/7aa05e7cada5f5bb844a56d563ce3a31.git",
+            "relativePath": "useful/Util/CoroutineTest.lua/",
+            "isDirty": true,
+            "gistID": "7aa05e7cada5f5bb844a56d563ce3a31"
+        },
+        {
+            "gistUrl": "https://gist.github.com/de8be807a757464a9fd9ea32cad4bee2.git",
+            "relativePath": "smaller.lua/",
+            "isDirty": false,
+            "gistID": "de8be807a757464a9fd9ea32cad4bee2"
+        }
+    ],
+    "Lua.type.weakNilCheck": true
+}

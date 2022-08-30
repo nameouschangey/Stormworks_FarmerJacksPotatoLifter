@@ -1,0 +1,182 @@
+
+require("LifeBoatAPI")
+
+onCreate = function(isWorldCreate)
+    server.announce("Test Addon", "Reloaded")
+    
+    -- lb init
+    LB.events.trackButtonPress = true
+    LB.events.trackPlayerChat = true
+    LB.events.trackPlayerCommand = true
+    LB.events.trackPlayerLife = true
+    LB.events.trackPlayerMap = true
+    LB.events.trackPlayerSpawnVehicle = true
+    LB.events.trackSitUnsit = true
+    LB.events.trackVehicleDamage = true
+    LB.events.trackVehicleTeleport = true
+
+    LB.players.enablePlayerSaveTracking = true
+    LB:init()
+end
+
+
+DialogueLine = {
+    text = "Excuse me! Hey, can you help me?",
+    choices = {
+        {reply="sure", next=1},
+        {reply="who are you?", next=2},
+        {reply="on yer bike mate", next=3}
+    },
+    timeout = 120,
+    next = 1
+}
+startDialogue = function(lines)
+
+end;
+
+LB.objects:registerScript("FarmerJack", function (farmerJack)
+    ---@cast farmerJack LifeBoatAPI.Object
+    server.announce("FarmerJack", "initializing")
+    
+    farmerJack.childZones[1].onCollision:register(function (l, context, zone, collision, collidingWith)
+        ---@cast collidingWith LifeBoatAPI.Player
+        local player = collidingWith
+
+        l:attach(
+            player.onChat:register(function (l, context, player, message)
+                
+            end)
+        )    
+    end)
+
+
+    local popup;
+    farmerJack.onCollision:register(function (l, context, object, collision, zone)
+
+        if not popup then
+            popup = LifeBoatAPI.UIPopupRelativePos:new(nil, "I'm in the zone!", LifeBoatAPI.Matrix:newMatrix(0, 1, 0), nil, 100, object, true)
+
+            LifeBoatAPI.CoroutineUtils.awaitAny(
+                --LifeBoatAPI.CoroutineUtils.delay(120),
+                collision.onCollisionEnd:await()
+            ):andImmediately(function (cr, deltaTicks, lastResult)
+                popup:despawn()
+                popup = nil;
+            end)
+        end
+    end)
+end)
+
+LB.objects:registerScript("ZoneScript", function (zone)
+    server.announce("ZoneScript init", "I'm a zone!")
+end)
+
+
+LB.events.onCustomCommand:register(function (l, context, fullMessage, peerID, isAdmin, isAuth, command, ...)
+    local args = {...}
+
+    if command == "?objects" then
+        local print = function(list)
+            for k,v in pairs(list) do
+                server.announce("object", tostring(k) .. " -> " .. tostring(v))
+            end
+        end;
+        print(LB.objects.savedata.objectsByID)
+        print(LB.objects.savedata.vehiclesByID)
+        print(LB.objects.savedata.zonesByID)
+        print(LB.objects.savedata.npcsByID)
+        print(LB.objects.savedata.firesByID)
+    end
+
+    
+    if command == "?objectscount" then
+        local total = 0
+        local print = function(list)
+            for k,v in pairs(list) do
+                total = total + 1
+            end
+        end;
+        print(LB.objects.savedata.objectsByID)
+        print(LB.objects.savedata.vehiclesByID)
+        print(LB.objects.savedata.npcsByID)
+        print(LB.objects.savedata.firesByID)
+
+        server.announce("total objects", tostring(total))
+    end
+    
+    if command == "?zonescount" then
+        local total = 0
+        local print = function(list)
+            for k,v in pairs(list) do
+                total = total + 1
+            end
+        end;
+        print(LB.objects.savedata.zonesByID)
+        server.announce("total zones", tostring(total))
+    end
+
+    if command == "?clear" then
+        ---@param list LifeBoatAPI.GameObject[]
+        local clear = function(list)
+            for k,v in pairs(list) do
+                v:despawn()
+            end
+        end;
+        clear(LB.objects.objectsByID)
+        clear(LB.objects.vehiclesByID)
+        clear(LB.objects.zonesByID)
+        clear(LB.objects.npcsByID)
+        clear(LB.objects.firesByID)
+    end
+
+    if command == "?uicount" then
+        local total = 0
+        local print = function(list)
+            for k,v in pairs(list) do
+                total = total + 1
+            end
+        end;
+        print(LB.ui.uiByID)
+        server.announce("total zones", tostring(total))
+    end
+
+    if command == "?uisavedcount" then
+        local total = 0
+        local print = function(list)
+            for k,v in pairs(list) do
+                total = total + 1
+            end
+        end;
+        print(LB.ui.savedata.uiByID)
+        server.announce("total zones", tostring(total))
+    end
+
+    if command == "?clearUI" then
+        ---@param list LifeBoatAPI.GameObject[]
+        local clear = function(list)
+            for k,v in pairs(list) do
+                v:despawn()
+            end
+        end;
+        clear(LB.ui.uiByID)
+    end
+
+    if command == "?spawnobj" then
+        local location = LB.addons.this.locations[1]
+        local tilePosition = LB.players.players[1]:getTransform() -- location:getPosition()
+        for i=1, (tonumber(args[1]) or 1) do
+            local obj = location.componentsByName["object1"]:spawnRelativeToPosition(tilePosition)
+            if not obj then
+                server.announce("spawn failed", tostring(i))
+            end
+        end
+    end
+
+    if command == "?spawnzone" then
+        local location = LB.addons.this.locations[1]
+        local tilePosition = location:getPosition()
+        for i=1, (tonumber(args[1]) or 1) do
+            location.componentsByName["zone1"]:spawnRelativeToPosition(tilePosition)
+        end
+    end
+end)
