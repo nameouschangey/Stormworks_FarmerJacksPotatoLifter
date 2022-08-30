@@ -21,6 +21,7 @@ onCreate = function(isWorldCreate)
 	
 	-- Initialize LB settings, and pick which (of the more expensive, e.g. vehicleDamage) events to care about
 	LB.events.trackPlayerChat = true
+    LB.events.trackButtonPress = true
 	LB:init()
 end
 
