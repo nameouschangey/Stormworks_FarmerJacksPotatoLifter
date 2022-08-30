@@ -1,10 +1,10 @@
 {
 	"folders": [
 		{
-			"path": "mc"
+			"path": "addon"
 		},
 		{
-			"path": "addon"
+			"path": "mc"
 		}
 	],
 	"settings": {}
