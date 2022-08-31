@@ -82,11 +82,11 @@ end)
         local jack = LB.objects:getNPC(mainsave.jackID)
         local zone = jack.childZones[1]
 
-        if savedata.isNew then
-            local popup = LifeBoatAPI.UIPopup:new(nil, "new", 0, 2, 0, 500, jack, true)
-            self:attach( zone.onCollision:await():andImmediately(function (cr, deltaTicks, lastResult)
+        if not savedata.isNew then
+            local popup = LifeBoatAPI.UIPopup:new(nil, "new", 0, 2, 0, 100, jack, true)
+            self:attach(zone.onCollision:await():andImmediately(function (cr, deltaTicks, lastResult)
                 popup:despawn()
-                savedata.isNew = false
+                savedata.isNew = true
             end) )
             self:attach(popup)
         end
@@ -135,7 +135,7 @@ end)
             lifterPopup:edit("")
 
             -- add a new popup to point the player to touch the actual workbench itself (delete when the vehicle leaves the collider, e.g. gets workbenched)
-            collision:attach(LifeBoatAPI.UIPopupRelativePos:new(nil, "Use workbench to edit Jack's Lifter", LifeBoatAPI.Matrix:newMatrix(0, 0, 0), nil, 50, workbenchCenter, true))
+            collision:attach(LifeBoatAPI.UIPopupRelativePos:new(nil, "Use workbench to edit Jack's Lifter", LifeBoatAPI.Matrix:newMatrix(0, 0, 0), nil, 500, workbenchCenter, true))
 
             collision.onCollisionEnd:register(function (l, context, collision)
                 -- put the lifter popup back on, in case you moved it *out* of the zone...
@@ -255,7 +255,7 @@ end)
         end)
 
         --- 3.3 The lifter is fixed, we can return to the main flow
-        local testSuccess = fixQuest:addNamedStage("TestSuccess", function (self, savedata, params)
+        fixQuest:addNamedStage("TestSuccess", function (self, savedata, params)
             local mainsave = self.parent.parent.savedata
 
             -- retrieve the actual Jack instance object
@@ -337,6 +337,13 @@ end)
                 end
             end)
             self:attach(collisionListener)
+
+            local cheat = LB.events.onCustomCommand:register(function (l, context, fullMessage, peerID, isAdmin, isAuth, command, ...)
+                if command == "?lb_dev_skip_cheat" then
+                    server.setVehiclePos(mainsave.lifterID, lifterReturnZone.transform)
+                end
+            end)
+            self:attach(cheat)
         end)
 
 

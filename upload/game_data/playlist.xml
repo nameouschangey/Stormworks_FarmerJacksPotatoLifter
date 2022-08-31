@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist path_id="app_data/data/missions/asdasd" folder_path="data/missions/asdasd" file_store="4" name="JackAndTheLifter">
+	<locations location_id_counter="2" component_id_counter="38">
+		<locations>
+			<l id="1" tile="data/tiles/island_33_tile_33.xml" name="FixTheLifter" env_mod_spawn_num="1">
+				<components>
+					<c component_type="10" id="12" cargo_zone_import_cargo_type="id_12,
+sizeX=5,
+sizeY=2,
+sizeZ=5,
+collisionLayer=player,
+parentID=17," dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 30="-405.050293" 31="12.855394" 32="355.17569"/>
+						<spawn_bounds>
+							<min x="-5" y="-1.731406" z="-5"/>
+							<max x="5" y="1.731406" z="5"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="2" id="17" name="id_17,
+onInitScript=FarmerJack," display_name="FarmerJack" dynamic_object_type="2" character_outfit_category="1" character_type="2" vehicle_file_store="1">
+						<spawn_transform 30="-405.110962" 31="12.21207" 32="355.005096"/>
+						<spawn_bounds>
+							<min x="-0.11" y="-0.8" z="-0.11"/>
+							<max x="0.11" y="0.8" z="0.11"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="3" id="18" name="id_18,
+isProp" dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_name="data/missions_working/vehicle_18.xml" vehicle_file_store="4" vehicle_is_static="true">
+						<spawn_transform 00="-0.340914" 02="0.940095" 20="-0.940095" 22="-0.340914" 30="-407.049377" 31="12.636684" 32="373.838867"/>
+						<spawn_bounds>
+							<min x="-1.375" y="-1.375" z="-6.625"/>
+							<max x="1.375" y="1.125" z="1.875"/>
+						</spawn_bounds>
+						<spawn_local_offset y="0.125" z="2.375"/>
+						<graph_links/>
+					</c>
+					<c component_type="3" id="25" name="id_25,
+collisionLayer=lifter," display_name="JacksLifter" dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_name="data/missions_working/vehicle_25.xml" vehicle_file_store="4" vehicle_is_editable="true">
+						<spawn_transform 00="0.481644" 02="0.876367" 20="-0.876367" 22="0.481644" 30="-398.821564" 31="12.723614" 32="372.838135"/>
+						<spawn_bounds>
+							<min x="-1.125" y="-0.625" z="-2.875"/>
+							<max x="0.875" y="2.125" z="2.125"/>
+						</spawn_bounds>
+						<spawn_local_offset x="0.125" y="-0.75" z="0.375"/>
+						<graph_links/>
+					</c>
+					<c component_type="10" id="27" cargo_zone_import_cargo_type="id_27,
+sizeX=15,
+sizeY=5,
+sizeZ=15,
+collisionLayer=lifter," display_name="WorkbenchZone" dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 00="0.730534" 01="-0.008274" 02="-0.682827" 10="0.005372" 11="0.999965" 12="-0.006369" 20="0.682856" 21="0.000985" 22="0.730553" 30="-185.883041" 31="8.731773" 32="310.750153"/>
+						<spawn_bounds>
+							<min x="-13.444091" y="-1.839965" z="-16.026351"/>
+							<max x="13.444091" y="1.839965" z="16.026351"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="10" id="28" cargo_zone_import_cargo_type="id_28,
+sizeX=15,
+sizeY=5,
+sizeZ=15,
+collisionLayer=lifter," display_name="LifterReturnZone" dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 00="0.967882" 02="-0.251404" 20="0.251404" 22="0.967882" 30="-406.897095" 31="12.982066" 32="366.041168"/>
+						<spawn_bounds>
+							<min x="-12.95505" y="-5" z="-13.509699"/>
+							<max x="12.95505" y="5" z="13.509699"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="10" id="29" cargo_zone_import_cargo_type="id_29" display_name="WorkbenchCenter" dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 00="0.532137" 02="0.846658" 20="-0.846658" 22="0.532137" 30="-164.386093" 31="9.667316" 32="318.158051"/>
+						<spawn_bounds>
+							<min x="-1.183027" y="-0.992644" z="-1.620126"/>
+							<max x="1.183027" y="0.992644" z="1.620126"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="10" id="30" cargo_zone_import_cargo_type="id_30" display_name="JackMoveTo2" dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 00="0.821759" 02="-0.569835" 20="0.569835" 22="0.821759" 30="-161.18721" 31="6.015088" 32="303.576447"/>
+						<spawn_bounds>
+							<min x="-0.352207" y="-0.760336" z="-0.474769"/>
+							<max x="0.352207" y="0.760336" z="0.474769"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="10" id="31" cargo_zone_import_cargo_type="id_31" display_name="JackMoveTo1" dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 30="-409.620728" 31="12.176826" 32="365.929352"/>
+						<spawn_bounds>
+							<min x="-0.65011" y="-0.463402" z="-0.439632"/>
+							<max x="0.65011" y="0.463402" z="0.439632"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="1" id="32" name="id_32,
+isProp," dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 00="0.955648" 02="-0.294513" 20="0.294513" 22="0.955648" 30="-404.658722" 31="11.745233" 32="370.421478"/>
+						<spawn_bounds>
+							<min x="-0.475" y="-0.475" z="-0.475"/>
+							<max x="0.475" y="0.475" z="0.475"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="1" id="33" name="id_33,
+isProp," dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 00="0.888583" 02="0.458716" 20="-0.458716" 22="0.888583" 30="-403.328979" 31="11.848114" 32="370.504242"/>
+						<spawn_bounds>
+							<min x="-0.475" y="-0.475" z="-0.475"/>
+							<max x="0.475" y="0.475" z="0.475"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="1" id="34" name="id_34,
+isProp," dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 00="0.903604" 02="-0.428368" 20="0.428368" 22="0.903604" 30="-404.251373" 31="11.848114" 32="371.69931"/>
+						<spawn_bounds>
+							<min x="-0.475" y="-0.475" z="-0.475"/>
+							<max x="0.475" y="0.475" z="0.475"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="1" id="36" name="id_36,
+isProp," dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 30="-404.096802" 31="12.715796" 32="370.974823"/>
+						<spawn_bounds>
+							<min x="-0.475" y="-0.475" z="-0.475"/>
+							<max x="0.475" y="0.475" z="0.475"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="1" id="37" name="id_37,
+isProp," dynamic_object_type="2" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 30="-406.594513" 31="13.095557" 32="373.821716"/>
+						<spawn_bounds>
+							<min x="-0.475" y="-0.475" z="-0.475"/>
+							<max x="0.475" y="0.475" z="0.475"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+					<c component_type="1" id="38" name="id_38,
+isProp," dynamic_object_type="29" character_outfit_category="11" character_type="1" vehicle_file_store="1">
+						<spawn_transform 30="-406.616821" 31="12.496893" 32="373.996948"/>
+						<spawn_bounds>
+							<min x="-0.8" y="-0.15" z="-0.8"/>
+							<max x="0.8" y="0.15" z="0.8"/>
+						</spawn_bounds>
+						<graph_links/>
+					</c>
+				</components>
+			</l>
+		</locations>
+	</locations>
+</playlist>
+
