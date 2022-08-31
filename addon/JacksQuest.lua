@@ -6,13 +6,14 @@
 --- If you have any issues, please report them here: https://github.com/nameouschangey/STORMWORKS_VSCodeExtension/issues - by Nameous Changey
 
 --[[ Overall Jacks-Quest storyline, made of multiple missions/chapters]]
-Mission_JacksQuest = LifeBoatAPI.Mission:new("Jack's Fork'd Lifter", function (self, savedata, params)
-    server.announce("Mission Spawn", "Jack's Fork'd Lifter is ready")
+Mission_JacksQuest = LifeBoatAPI.Mission:new("Jack and The Lifter", function (self, savedata, params)
     -- spawn
     if g_savedata.jacksQuestComplete then
         self:terminate()
         return -- sit idly on this stage forever, mission is already complete; can't repeat it 
     end
+
+    server.announce("Mission Active", "Jack and The Lifter")
 
     -- if we've not yet spawned the stuff needed for the mission, spawn it
     -- see the mission location data in-game
@@ -42,6 +43,13 @@ Mission_JacksQuest = LifeBoatAPI.Mission:new("Jack's Fork'd Lifter", function (s
         LB.objects:getZone(savedata.jackMoveTo2),
         LB.objects:getObjectCollection(savedata.propsID)
     )
+
+    local cheat = LB.events.onCustomCommand:register(function (l, context, fullMessage, peerID, isAdmin, isAuth, command, ...)
+        if command == "?lb_dev_end_cheat" then
+            self:next()
+        end
+    end)
+    self:attach(cheat)
 end)
 
 --[[ MISSION STAGES ]]
@@ -93,7 +101,7 @@ end)
                 -- on dialog ended, save the results
                 LifeBoatAPI.lb_copy(results, savedata)
                 if results.missionAccepted then
-                    server.notify(-1, "Jack's Fork'd Lifter", "Accepted.\n\nTake Jack's lifter to the workbench and fix it.", LifeBoatAPI.Constants.NotifiationTypes.new_mission)
+                    server.notify(-1, "Accepted: Jack and The Lifter", "Take Jack's lifter to the workbench and fix it.", LifeBoatAPI.Constants.NotifiationTypes.new_mission)
                     self:terminate()
                 end
             end)
@@ -116,7 +124,7 @@ end)
         -- DEBUG, allow cheating to skip to the next stage, what's very cool is it works
         self:attach(
             LB.events.onCustomCommand:register(function (l, context, fullMessage, peerID, isAdmin, isAuth, command, ...)
-                if command == "?cheat" then
+                if command == "?lb_dev_skip_cheat" then
                     server.setVehiclePos(lifter.id, workbenchZone.transform)
                 end
             end)
@@ -156,8 +164,17 @@ end)
 
         -- loop these quest stages, until we have a working/valid vehicle
         -- 3.1. Wait for the player to spawn the fixed lifter
+        local isRespawn = true; -- non-persist global state, for checking if we're loading from a save
         fixQuest:addNamedStage("WaitForSpawn", function (self, savedata, params)
             local mainsave = self.parent.parent.savedata
+
+            -- this specific interaction is important otherwise the player can be quite lost about what to do next
+            if isRespawn then
+                isRespawn = false;
+                local jack = LB.objects:getNPC(mainsave.jackID)
+                local popup = LifeBoatAPI.UIPopup:new(nil, "Once you've fixed it in the workbench\n\nJust spawn it back again.", 0, 1, 0, 50, jack, true)
+                self:attach(popup)
+            end
 
             local listener = LB.events.onVehicleSpawn:register(function (l, context, vehicleID, peerID, x, y, z, cost)
                 if peerID >= 0 then
@@ -169,6 +186,7 @@ end)
                         if success then
                             vehicle:setCollisionLayer("lifter")
                             mainsave.lifterID = vehicle.id
+                            self.parent.parent:attach(vehicle)
                             self:terminate()
                         end
                     end)
@@ -245,8 +263,9 @@ end)
             local zone = jack.childZones[1]
 
             local jackDialogModel = LifeBoatAPI.Dialog:new({
-                { id="start",       text = "Thanks for fixing it!\n\nYou've done a great job.", result={hasSpokenOnce=true}},
+                { id="start",       text = "Thanks for fixing it!\n\nYou've done a great job.", },
                 {                   text = "I know I'm asking a lot.\n\nBut could you give it a lick of paint too?",
+                                        result={hasSpokenOnce=true},
                                         choices={ {phrase="ok", next="accept", result={paintJob=true}},
                                                   {phrase="reward", next="reward"},
                                                   {phrase="no", next="basic"}}, showChoices=true},
@@ -276,7 +295,7 @@ end)
                     LifeBoatAPI.lb_copy(results, savedata)
                     if results.paintJob then
                         mainsave.wasPaintJobOffered = true
-                        server.notify(-1, "Additional Task", "Scrape off the rust and re-paint Jack's lifter for an extra $2500", LifeBoatAPI.Constants.NotifiationTypes.new_mission)
+                        server.notify(-1, "Accepted: Side-Task", "Scrape off the rust and re-paint Jack's lifter.", LifeBoatAPI.Constants.NotifiationTypes.new_mission)
                     end
 
                     if results.gotoTruck then
@@ -301,6 +320,7 @@ end)
                         if success then
                             vehicle:setCollisionLayer("lifter")
                             mainsave.lifterID = vehicle.id
+                            self.parent.parent:attach(vehicle)
                             mainsave.wasPaintJobComplete = savedata.paintJob -- can't get the paintjob bonus if you didn't even listen to him
                             l.isDisposed = true
                         end
@@ -338,22 +358,22 @@ end)
 
 
             local jackDialogModel = LifeBoatAPI.Dialog:new({
-                { id="paintJob",        text = "Amazing, you've really outdone yourself.", next="paintJob2", conditionals={wasaPaintJobOffered=true, wasPaintJobComplete=true}},
-                { id="paintJob_off",    text = "I thought you said you'd paint it?\n\nNevermind, this is still good.", next="paintJob_off2", conditionals={wasaPaintJobOffered=true}},
+                { id="paintJob",        text = "Amazing, you've really outdone yourself.", next="paintJob2", conditionals={wasPaintJobOffered=true, wasPaintJobComplete=true}},
+                { id="paintJob_off",    text = "I thought you said you'd paint it?\n\nNevermind, this is still good.", next="paintJob_off2", conditionals={wasPaintJobOffered=true}},
 
                 { id="noPaintJob",  text = "Thanks for fixing it!\n\nYou've done a great job."},
                 {                   text = "Here's your reward, $5000 as promised."},
-                {                   text = "I'm going to finish up these potatoes, and then I guess I'll be going.", terminate=true},
+                {                   text = "I'm going to finish up these potatoes, and then I guess I'll be going.", terminate=true, result={complete=true}},
 
                 { id="paintJob2",   text = "I've got $5000 for fixing it.\n\nAnd another $2500 for the paint job!"},
                 {                   text = "I best finish up the potatoes now.\n\nI'll be off shortly."},
                 {                   text = "If you ever want.\n\nYou'd always be welcome on the farm with me."},
-                {                   text = "Anyway, cheerio!", terminate=true},
+                {                   text = "Anyway, cheerio!", terminate=true, result={complete=true}},
 
                 { id="paintJob_off2",   text = "I've got $5000 for fixing it."},
                 {                   text = "But I can't pay you for not painting it.\n\n"},
                 {                   text = "I'll be honest.\n\nI'd rather you'd just declined if you couldn't do it."},
-                {                   text = "Well, I'm off.\n\n Thanks again!", terminate=true}
+                {                   text = "Well, I'm off.\n\n Thanks again!", terminate=true, result={complete=true}}
 
             }, 120)
     
@@ -364,25 +384,31 @@ end)
                     -- on dialog ended, save the results
                     LifeBoatAPI.lb_copy(results, savedata)
 
-                    server.notify(-1, "Reward", "You've been paid $5000 for completing 'Jacks Fork'd Lifter'.", LifeBoatAPI.Constants.NotifiationTypes.complete_mission)
-                    if mainsave.wasPaintJobComplete then
-                        server.notify(-1, "Bonus Reward", "Jack has paid you an additional $2500 for painting the lifter.", LifeBoatAPI.Constants.NotifiationTypes.complete_mission)
+                    if results.complete then
+                        if not mainsave.rewardPaid then
+                            server.notify(-1, "Reward", "You've been paid $5000 for completing 'Jack and The Lifter'.", LifeBoatAPI.Constants.NotifiationTypes.complete_mission)
+                            if mainsave.wasPaintJobComplete then
+                                server.notify(-1, "Bonus Reward", "Jack has paid you an additional $2500 for painting the lifter.", LifeBoatAPI.Constants.NotifiationTypes.complete_mission)
+                            end
+
+                            mainsave.rewardPaid = true
+                            local reward = 5000 + (mainsave.wasPaintJobComplete and 2500 or 0)
+                            server.setCurrency(server.getCurrency() + reward, server.getResearchPoints())
+                        end
+
+                        self:terminate()
                     end
 
-                    if not mainsave.rewardPaid then
-                        mainsave.rewardPaid = true
-                        local reward = 5000 + (mainsave.wasPaintJobComplete and 2500 or 0)
-                        server.setCurrency(server.getCurrency() + reward, server.getResearchPoints())
-                    end
-
-                    self:terminate()
-                end, {wasPaintJobOffered=mainsave.wasPaintJobOffered, wasPaintJobComplete=mainsave.wasPaintJobComplete})
+                end, {wasPaintJobOffered=mainsave.wasPaintJobOffered,
+                      wasPaintJobComplete=mainsave.wasPaintJobComplete})
     
             self:attach(dialogHandler)
         end)
 
     -- 4. The lifter is fixed, and Jack wants to use it, or something like that
-    Mission_JacksQuest:addStage(function (self, savedata, params)
+    Mission_JacksQuest:addStage(function (self, savedata, params)        
+        g_savedata.jacksQuestComplete = true
+
         local timeout = LifeBoatAPI.CoroutineUtils.delay(300)
             :andThen(function (cr, deltaTicks, lastResult)
                 self:terminate()
